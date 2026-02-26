@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import app.models  # noqa: F401 — registers all ORM models on startup
 from app.config import settings
-from app.routers import auth, dogs, users
+from app.routers import auth, breeds, dogs, users
 
 app = FastAPI(
     title="RodoWod API",
@@ -24,6 +24,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(dogs.router)
+app.include_router(breeds.router)
 
 
 @app.get("/api/health")
