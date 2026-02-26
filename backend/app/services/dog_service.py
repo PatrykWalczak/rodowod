@@ -4,8 +4,9 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.models.breed import Breed
+from app.models.breed import Breed, SizeCategory
 from app.models.dog import Dog, DogSex
+from app.models.user import User
 from app.schemas.dog import DogCreate, DogListResponse, DogUpdate
 
 
@@ -100,10 +101,16 @@ async def list_dogs(
     breed_id: int | None = None,
     sex: DogSex | None = None,
     is_available_for_breeding: bool | None = None,
+    name: str | None = None,
+    voivodeship: str | None = None,
+    city: str | None = None,
+    size_category: SizeCategory | None = None,
+    fci_group: int | None = None,
+    sort_by: str | None = None,
     page: int = 1,
     limit: int = 20,
 ) -> DogListResponse:
-    """Return paginated list of dogs with optional filters."""
+    """Return paginated list of dogs with optional filters and sorting."""
     # Base query — only active dogs with breed loaded
     query = (
         select(Dog)
@@ -118,6 +125,33 @@ async def list_dogs(
         query = query.where(Dog.sex == sex)
     if is_available_for_breeding is not None:
         query = query.where(Dog.is_available_for_breeding == is_available_for_breeding)
+    if name is not None:
+        query = query.where(Dog.name.ilike(f"%{name}%"))
+
+    # Breed attribute filters via subquery (avoids JOIN conflict with joinedload)
+    if size_category is not None:
+        query = query.where(
+            Dog.breed_id.in_(select(Breed.id).where(Breed.size_category == size_category))
+        )
+    if fci_group is not None:
+        query = query.where(
+            Dog.breed_id.in_(select(Breed.id).where(Breed.fci_group == fci_group))
+        )
+
+    # Owner location filters via subquery
+    if voivodeship is not None or city is not None:
+        owner_query = select(User.id).where(User.is_active == True)  # noqa: E712
+        if voivodeship is not None:
+            owner_query = owner_query.where(User.voivodeship == voivodeship)
+        if city is not None:
+            owner_query = owner_query.where(User.city.ilike(f"%{city}%"))
+        query = query.where(Dog.owner_id.in_(owner_query))
+
+    # Sorting
+    if sort_by == "name":
+        query = query.order_by(Dog.name.asc())
+    else:
+        query = query.order_by(Dog.created_at.desc())
 
     # Count total matching records (for pagination metadata)
     count_result = await db.execute(select(func.count()).select_from(query.subquery()))

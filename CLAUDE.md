@@ -82,6 +82,6 @@ env\Scripts\python -m app.seed.breeds
 - ✅ FAZA 3: Profile Użytkowników — `docs/phases/phase-3.md`
 - ✅ CI/CD — `docs/phases/phase-cicd.md`
 - ✅ FAZA 4: Profile Psów — `docs/phases/phase-4.md`
-- ⏳ FAZA 5: Wyszukiwanie i Odkrywanie — NASTĘPNA
-- 🔜 FAZA 6: Frontend UI
+- ✅ FAZA 5: Wyszukiwanie i Odkrywanie — `docs/phases/phase-5.md`
+- ⏳ FAZA 6: Frontend UI — NASTĘPNA
 - 🔜 FAZA 7: Testy i Jakość

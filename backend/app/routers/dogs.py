@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import get_current_user, get_db
+from app.models.breed import SizeCategory
 from app.models.dog import DogSex
 from app.models.user import User
 from app.schemas.dog import DogCreate, DogListResponse, DogResponse, DogUpdate, PedigreeNode
@@ -17,16 +18,28 @@ async def list_dogs(
     breed_id: int | None = Query(None, description="Filter by breed ID"),
     sex: DogSex | None = Query(None, description="Filter by sex"),
     is_available_for_breeding: bool | None = Query(None, description="Filter by breeding availability"),  # noqa: E501
+    name: str | None = Query(None, description="Search by dog name (partial match)"),
+    voivodeship: str | None = Query(None, description="Filter by owner's voivodeship"),
+    city: str | None = Query(None, description="Filter by owner's city (partial match)"),
+    size_category: SizeCategory | None = Query(None, description="Filter by breed size category"),
+    fci_group: int | None = Query(None, ge=1, le=10, description="Filter by FCI group (1-10)"),
+    sort_by: str | None = Query(None, pattern="^(newest|name)$", description="Sort order: newest or name"),  # noqa: E501
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(20, ge=1, le=100, description="Results per page"),
     db: AsyncSession = Depends(get_db),
 ):
-    """Return paginated list of dogs with optional filters."""
+    """Return paginated list of dogs with optional filters and sorting."""
     return await dog_service.list_dogs(
         db,
         breed_id=breed_id,
         sex=sex,
         is_available_for_breeding=is_available_for_breeding,
+        name=name,
+        voivodeship=voivodeship,
+        city=city,
+        size_category=size_category,
+        fci_group=fci_group,
+        sort_by=sort_by,
         page=page,
         limit=limit,
     )

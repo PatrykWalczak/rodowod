@@ -30,6 +30,26 @@ fci_number=None dla odmian dzielących numer FCI (jamniki, pudel miniaturowy/śr
 ### Swagger UI
 Auto-wypełnia UUID placeholdery dla opcjonalnych pól. Przy testach używać minimalnego JSON.
 
+## SQLAlchemy — wyszukiwanie przez relacje
+
+### joinedload + explicit JOIN → konflikt
+Gdy `list_dogs()` używa `options(joinedload(Dog.breed))` do eager loading, dodanie `.join(Breed)` dla filtrowania tworzy zduplikowany JOIN. Zamiast tego używaj subquery:
+```python
+# ŹLE — duplikuje JOIN
+query = query.join(Breed).where(Breed.size_category == ...)
+
+# DOBRZE — subquery
+query = query.where(Dog.breed_id.in_(select(Breed.id).where(Breed.size_category == ...)))
+```
+
+### FastAPI — kolejność tras ze statycznym i dynamicznym segmentem
+Trasy statyczne MUSZĄ być zdefiniowane przed dynamicznymi w tym samym routerze:
+```python
+@router.get("/groups")        # NAJPIERW statyczna
+@router.get("/{breed_id}")    # POTEM dynamiczna (int)
+```
+Inaczej FastAPI próbuje rzutować "groups" → int → 422 zamiast dopasować statyczną trasę.
+
 ## Środowisko
 
 ### venv

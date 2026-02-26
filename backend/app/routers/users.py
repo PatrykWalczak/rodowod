@@ -1,15 +1,31 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import get_current_user, get_db
 from app.models.user import User
 from app.schemas.dog import DogResponse
-from app.schemas.user import UserResponse, UserUpdate
+from app.schemas.user import UserListResponse, UserResponse, UserUpdate
 from app.services import user_service
 
 router = APIRouter(prefix="/api/users", tags=["users"])
+
+
+@router.get("/", response_model=UserListResponse)
+async def list_users(
+    q: str | None = Query(None, description="Search by name or kennel name (partial match)"),
+    is_breeder: bool | None = Query(None, description="Filter by breeder status"),
+    city: str | None = Query(None, description="Filter by city (partial match)"),
+    voivodeship: str | None = Query(None, description="Filter by voivodeship"),
+    page: int = Query(1, ge=1, description="Page number"),
+    limit: int = Query(20, ge=1, le=100, description="Results per page"),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return paginated list of users with optional filters."""
+    return await user_service.list_users(
+        db, q=q, is_breeder=is_breeder, city=city, voivodeship=voivodeship, page=page, limit=limit
+    )
 
 
 @router.get("/{user_id}", response_model=UserResponse)
