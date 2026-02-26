@@ -285,9 +285,39 @@ Wszystko zweryfikowane i działa.
 - `backend/app/routers/users.py` — GET /{user_id}, PUT /me, GET /{user_id}/dogs
 - `backend/app/main.py` — podpięty router users
 
-### ⏳ CI/CD — NASTĘPNE (przed Fazą 4)
-### 🔜 FAZA 3: Profile Użytkowników
-### 🔜 FAZA 4: Profile Psów - CRUD
+### ✅ CI/CD — UKOŃCZONE
+
+**Zrobione:**
+- `.github/workflows/ci.yml` — pipeline Backend + Frontend
+- Backend: `ruff check` + `pytest` (5 testów)
+- Frontend: `npm run lint` + `npm run build`
+- `backend/tests/test_health.py` — test health check endpoint
+- `backend/tests/test_auth_schemas.py` — 4 testy walidacji schematów Pydantic
+- `backend/pyproject.toml` — dodane `[tool.setuptools.packages.find]` + ruff exclude alembic + ignore F821
+- Repo: https://github.com/PatrykWalczak/rodowod.git
+- Workflow: feature branch → PR → CI → merge do main
+
+**Uwagi implementacyjne:**
+- `alembic/` wykluczony z ruff (auto-generowany kod)
+- F821 ignorowane globalnie (forward references w SQLAlchemy)
+- CI odpala się automatycznie przy push i PR na main
+
+### ✅ FAZA 4: Profile Psów — UKOŃCZONA
+
+**Zrobione:**
+- `backend/app/schemas/dog.py` — DogCreate, DogUpdate, DogResponse (z BreedInfo), DogListResponse, PedigreeNode (rekurencyjny)
+- `backend/app/services/dog_service.py` — create_dog, get_dog_by_id, update_dog, delete_dog, list_dogs (paginacja + filtry), get_pedigree
+- `backend/app/routers/dogs.py` — GET /, POST /, GET /{id}, PUT /{id}, DELETE /{id}, GET /{id}/pedigree
+- `backend/app/main.py` — podpięty router dogs
+
+**Uwagi implementacyjne:**
+- Soft-delete: `is_active=False` zamiast usuwania rekordu
+- Paginacja: ceiling division `-(-total // limit)` bez math.ceil
+- PedigreeNode rekurencyjny wymaga `model_rebuild()` po definicji klasy
+- Swagger UI auto-wypełnia UUID placeholdery — przy testach używać minimalnego JSON bez opcjonalnych pól
+- Filtry dynamiczne: WHERE dodawane tylko dla podanych parametrów
+
+### ⏳ FAZA 5: Wyszukiwanie i Odkrywanie — NASTĘPNA
 ### 🔜 FAZA 5: Wyszukiwanie i Odkrywanie
 ### 🔜 FAZA 6: Polish i Responsive Design
 ### 🔜 FAZA 7: Testy i Jakość
