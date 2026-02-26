@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/dogs", tags=["dogs"])
 async def list_dogs(
     breed_id: int | None = Query(None, description="Filter by breed ID"),
     sex: DogSex | None = Query(None, description="Filter by sex"),
-    is_available_for_breeding: bool | None = Query(None, description="Filter by breeding availability"),
+    is_available_for_breeding: bool | None = Query(None, description="Filter by breeding availability"),  # noqa: E501
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(20, ge=1, le=100, description="Results per page"),
     db: AsyncSession = Depends(get_db),
