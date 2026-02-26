@@ -3,6 +3,8 @@
 import { isServer, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
+import { AuthProvider } from '@/hooks/useAuth'
+
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -32,7 +34,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <AuthProvider>
+        {children}
+      </AuthProvider>
       {/* DevTools panel visible only in development */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
