@@ -87,7 +87,7 @@ export default function DogProfilePage() {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">{dog.name}</h1>
           {dog.call_name && (
-            <p className="text-muted-foreground">„{dog.call_name}"</p>
+            <p className="text-muted-foreground">&bdquo;{dog.call_name}&rdquo;</p>
           )}
           <div className="flex flex-wrap gap-2 pt-1">
             <Badge variant="outline">{SEX_LABEL[dog.sex]}</Badge>
