@@ -8,10 +8,10 @@ import asyncio
 
 from sqlalchemy import select
 
+import app.models.dog  # noqa: F401 — registers Dog model so relationships resolve
+import app.models.user  # noqa: F401 — registers User model so relationships resolve
 from app.db.session import AsyncSessionLocal
 from app.models.breed import Breed, SizeCategory
-import app.models.user  # noqa: F401 — registers User model so relationships resolve
-import app.models.dog   # noqa: F401 — registers Dog model so relationships resolve
 
 BREEDS_DATA = [
     # --- FCI Group 1: Sheepdogs and Cattledogs ---
