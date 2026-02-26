@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
 import app.models  # noqa: F401 — registers all ORM models on startup
+from app.config import settings
 from app.routers import auth, users
 
 app = FastAPI(
